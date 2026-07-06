@@ -1,0 +1,56 @@
+{
+    "project": {
+        "name": "Root Cause Attribution Framework",
+        "version": "3.0.0",
+        "stage": "Alpha",
+        "framework_id": "RCAF",
+        "author": "Rajcomar",
+        "created": "2026-07-06 20:21:12",
+        "description": "A modular research framework for Bayesian root cause attribution using autoencoders."
+    },
+    "environment": {
+        "python_version": "3.13.2",
+        "operating_system": "Darwin",
+        "os_version": "25.5.0",
+        "machine": "arm64",
+        "processor": "arm"
+    },
+    "paths": {
+        "root": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework",
+        "config": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/config",
+        "core": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/core",
+        "datasets": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/datasets",
+        "models": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/models",
+        "signals": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/signals",
+        "bayesian": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/bayesian",
+        "experiments": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/experiments",
+        "evaluation": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/evaluation",
+        "reporting": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/reporting",
+        "visualization": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/visualization",
+        "utils": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/utils",
+        "tests": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/tests",
+        "data": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/data",
+        "raw_data": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/data/raw",
+        "processed_data": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/data/processed",
+        "cache": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/data/cache",
+        "outputs": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/outputs",
+        "excel": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/outputs/Excel",
+        "figures": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/outputs/Figures",
+        "latex": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/outputs/Latex",
+        "metadata": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/outputs/Metadata",
+        "logs": "/Users/shikarrajcomar/Documents/GitHub/RootCauseFramework/logs"
+    },
+    "logging": {
+        "level": "INFO",
+        "console_logging": true,
+        "file_logging": true,
+        "log_filename": "framework.log",
+        "log_format": "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+    },
+    "execution": {
+        "random_seed": 42,
+        "device": "AUTO",
+        "debug_mode": false,
+        "deterministic": true
+    }
+}
