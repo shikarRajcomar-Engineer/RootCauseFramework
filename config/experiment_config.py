@@ -261,3 +261,325 @@ class StatisticsConfig:
     rank_method: RankingMethod = (
         RankingMethod.DESCENDING
     )
+
+# ============================================================
+# BOOTSTRAP CONFIGURATION
+# ============================================================
+
+
+@dataclass(slots=True)
+class BootstrapConfig:
+    """
+    Controls bootstrap resampling used for
+    estimating confidence intervals and
+    statistical robustness.
+    """
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.bootstrap.enabled = True
+    #
+    # --------------------------------------------------------
+
+    enabled: bool = False
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.bootstrap.iterations = 1000
+    #
+    # --------------------------------------------------------
+
+    iterations: int = DEFAULT_BOOTSTRAP_ITERATIONS
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.bootstrap.confidence_level = 0.95
+    #
+    # --------------------------------------------------------
+
+    confidence_level: float = DEFAULT_CONFIDENCE_LEVEL
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.bootstrap.random_seed = 42
+    #
+    # --------------------------------------------------------
+
+    random_seed: int = DEFAULT_RANDOM_SEED
+
+
+# ============================================================
+# EVALUATION CONFIGURATION
+# ============================================================
+
+
+@dataclass(slots=True)
+class EvaluationConfig:
+    """
+    Controls how attribution performance
+    is evaluated.
+    """
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.evaluation.top_k = 1
+    #
+    # --------------------------------------------------------
+
+    top_k: int = DEFAULT_TOP_K
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.evaluation.compute_accuracy = True
+    #
+    # --------------------------------------------------------
+
+    compute_accuracy: bool = True
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.evaluation.compute_precision = True
+    #
+    # --------------------------------------------------------
+
+    compute_precision: bool = True
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.evaluation.compute_recall = True
+    #
+    # --------------------------------------------------------
+
+    compute_recall: bool = True
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.evaluation.compute_f1 = True
+    #
+    # --------------------------------------------------------
+
+    compute_f1: bool = True
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.evaluation.compute_balanced_accuracy = True
+    #
+    # --------------------------------------------------------
+
+    compute_balanced_accuracy: bool = True
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.evaluation.compute_specificity = True
+    #
+    # --------------------------------------------------------
+
+    compute_specificity: bool = True
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.evaluation.save_confusion_matrix = True
+    #
+    # --------------------------------------------------------
+
+    save_confusion_matrix: bool = True
+
+# ============================================================
+# OUTPUT CONFIGURATION
+# ============================================================
+
+
+@dataclass(slots=True)
+class OutputConfig:
+    """
+    Controls which experiment outputs
+    are generated.
+    """
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.output.save_excel = True
+    #
+    # --------------------------------------------------------
+
+    save_excel: bool = True
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.output.save_figures = True
+    #
+    # --------------------------------------------------------
+
+    save_figures: bool = True
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.output.save_metadata = True
+    #
+    # --------------------------------------------------------
+
+    save_metadata: bool = True
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.output.save_models = False
+    #
+    # --------------------------------------------------------
+
+    save_models: bool = False
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.output.overwrite_existing = False
+    #
+    # --------------------------------------------------------
+
+    overwrite_existing: bool = False
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.output.experiment_folder = "AUTO"
+    #
+    # AUTO creates a timestamped folder.
+    #
+    # --------------------------------------------------------
+
+    experiment_folder: str = "AUTO"
+
+# ============================================================
+# RUNTIME CONFIGURATION
+# ============================================================
+
+
+@dataclass(slots=True)
+class RuntimeConfig:
+    """
+    Controls execution behaviour.
+    """
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.runtime.parallel_processing = True
+    #
+    # --------------------------------------------------------
+
+    parallel_processing: bool = False
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.runtime.number_of_workers = 8
+    #
+    # --------------------------------------------------------
+
+    number_of_workers: int = 1
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.runtime.verbose = True
+    #
+    # --------------------------------------------------------
+
+    verbose: bool = True
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.runtime.save_intermediate_results = False
+    #
+    # --------------------------------------------------------
+
+    save_intermediate_results: bool = False
+
+    # --------------------------------------------------------
+    # Example
+    #
+    # experiment.runtime.stop_on_error = True
+    #
+    # --------------------------------------------------------
+
+    stop_on_error: bool = True
+
+# ============================================================
+# MASTER EXPERIMENT CONFIGURATION
+# ============================================================
+
+
+@dataclass(slots=True)
+class ExperimentConfig:
+    """
+    Master experiment configuration.
+
+    Every experiment within the framework
+    receives a single ExperimentConfig object.
+
+    Example
+
+    experiment.info.name
+
+    experiment.faults.enabled_faults
+
+    experiment.window.window_size
+
+    experiment.statistics.summary_method
+
+    experiment.bootstrap.iterations
+
+    experiment.evaluation.top_k
+
+    experiment.output.save_excel
+
+    experiment.runtime.parallel_processing
+    """
+
+    info: ExperimentInfo = field(
+        default_factory=ExperimentInfo
+    )
+
+    faults: FaultConfig = field(
+        default_factory=FaultConfig
+    )
+
+    window: WindowConfig = field(
+        default_factory=WindowConfig
+    )
+
+    statistics: StatisticsConfig = field(
+        default_factory=StatisticsConfig
+    )
+
+    bootstrap: BootstrapConfig = field(
+        default_factory=BootstrapConfig
+    )
+
+    evaluation: EvaluationConfig = field(
+        default_factory=EvaluationConfig
+    )
+
+    output: OutputConfig = field(
+        default_factory=OutputConfig
+    )
+
+    runtime: RuntimeConfig = field(
+        default_factory=RuntimeConfig
+    )
