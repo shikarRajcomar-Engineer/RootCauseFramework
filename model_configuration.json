@@ -5,7 +5,7 @@
         "version": "1.0",
         "author": "Rajcomar",
         "model_id": "MODEL001",
-        "created": "2026-07-11 20:19:50",
+        "created": "2026-07-11 20:21:02",
         "model_type": "AUTOENCODER"
     },
     "architecture": {
@@ -58,7 +58,7 @@
         "mode": "min"
     },
     "storage": {
-        "use_saved_model": false,
+        "use_saved_model": true,
         "auto_load_if_exists": true,
         "save_model": true,
         "save_scaler": true,

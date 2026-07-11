@@ -373,7 +373,7 @@ class ModelStorageConfig:
 
     """
 
-    use_saved_model: bool = False
+    use_saved_model: bool = True
     auto_load_if_exists: bool = True
     save_model: bool = True
     save_scaler: bool = True
