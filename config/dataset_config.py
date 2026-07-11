@@ -313,3 +313,290 @@ class ValidationConfig:
     validate_missing: bool = True
     validate_feature_names: bool = True
     validate_numeric: bool = True
+
+
+# ============================================================
+# MASTER DATASET CONFIGURATION
+# ============================================================
+
+
+@dataclass(slots=True)
+class DatasetConfig:
+    """
+    Master dataset configuration.
+
+    Every dataset loaded by the framework
+    receives one DatasetConfig object.
+    """
+
+    info: DatasetInfo = field(default_factory=DatasetInfo)
+
+    file: FileConfig = field(default_factory=FileConfig)
+
+    columns: ColumnConfig = field(default_factory=ColumnConfig)
+
+    split: SplitConfig = field(default_factory=SplitConfig)
+
+    scaling: ScalingConfig = field(default_factory=ScalingConfig)
+
+    missing: MissingValueConfig = field(default_factory=MissingValueConfig)
+
+    labels: LabelConfig = field(default_factory=LabelConfig)
+
+    validation: ValidationConfig = field(default_factory=ValidationConfig)
+
+
+# ============================================================
+# CONFIGURATION UTILITIES
+# ============================================================
+
+import json
+import hashlib
+from dataclasses import asdict
+
+
+class DatasetConfigurationError(Exception):
+    """
+    Raised when the dataset configuration
+    is invalid.
+    """
+    pass
+
+
+# ============================================================
+# DATASET CONFIGURATION MANAGER
+# ============================================================
+
+
+class DatasetConfigurationManager:
+    """
+    Utility class responsible for validating,
+    exporting and summarising dataset
+    configurations.
+    """
+
+    def __init__(self, config: DatasetConfig):
+
+        self.config = config
+
+    # --------------------------------------------------------
+
+    def validate(self) -> None:
+        """
+        Validate the dataset configuration.
+        """
+
+        # -----------------------------
+        # File Path
+        # -----------------------------
+
+        if not isinstance(self.config.file.file_path, Path):
+
+            raise DatasetConfigurationError(
+                "file_path must be a pathlib.Path object."
+            )
+
+        # -----------------------------
+        # Dataset Split
+        # -----------------------------
+
+        total = (
+            self.config.split.train_size
+            + self.config.split.validation_size
+            + self.config.split.test_size
+        )
+
+        if abs(total - 1.0) > 1e-6:
+
+            raise DatasetConfigurationError(
+                "Train, validation and test "
+                "splits must sum to 1.0."
+            )
+
+        # -----------------------------
+        # Scaling
+        # -----------------------------
+
+        low, high = self.config.scaling.feature_range
+
+        if low >= high:
+
+            raise DatasetConfigurationError(
+                "Feature range is invalid."
+            )
+
+        # -----------------------------
+        # Missing Values
+        # -----------------------------
+
+        if (
+            self.config.missing.maximum_missing_percentage < 0
+            or
+            self.config.missing.maximum_missing_percentage > 1
+        ):
+
+            raise DatasetConfigurationError(
+                "Maximum missing percentage "
+                "must be between 0 and 1."
+            )
+
+        # -----------------------------
+        # Feature Columns
+        # -----------------------------
+
+        if len(self.config.columns.feature_columns) == 0:
+
+            print(
+                "Warning: No feature columns "
+                "have been specified."
+            )
+
+
+    # --------------------------------------------------------
+
+    def to_dictionary(self) -> dict:
+        """
+        Convert configuration to a dictionary.
+        """
+
+        dictionary = asdict(self.config)
+
+        return self._convert(dictionary)
+
+    # --------------------------------------------------------
+
+    def save_json(self, filename: Path) -> None:
+        """
+        Save configuration to JSON.
+        """
+
+        with open(filename, "w", encoding="utf-8") as file:
+
+            json.dump(
+
+                self.to_dictionary(),
+
+                file,
+
+                indent=4
+
+            )
+
+    # --------------------------------------------------------
+
+    def configuration_hash(self) -> str:
+        """
+        Generate a unique configuration hash.
+        """
+
+        data = json.dumps(
+
+            self.to_dictionary(),
+
+            sort_keys=True
+
+        )
+
+        return hashlib.sha256(
+
+            data.encode("utf-8")
+
+        ).hexdigest()
+
+    # --------------------------------------------------------
+
+    @staticmethod
+    def _convert(item):
+
+        if isinstance(item, Path):
+
+            return str(item)
+
+        if isinstance(item, Enum):
+
+            return item.name
+
+        if isinstance(item, dict):
+
+            return {
+
+                key: DatasetConfigurationManager._convert(value)
+
+                for key, value in item.items()
+
+            }
+
+        if isinstance(item, list):
+
+            return [
+
+                DatasetConfigurationManager._convert(value)
+
+                for value in item
+
+            ]
+
+        return item
+    
+    # --------------------------------------------------------
+
+    def summary(self) -> None:
+        """
+        Display the current dataset configuration.
+        """
+
+        print("=" * 70)
+        print(self.config.info.name)
+        print("=" * 70)
+        print(f"Dataset ID      : {self.config.info.dataset_id}")
+        print(f"Version         : {self.config.info.version}")
+        print(f"Author          : {self.config.info.author}")
+        print()
+        print("File")
+        print(self.config.file.file_path)
+        print()
+        print("Features")
+        print(self.config.columns.feature_columns)
+        print()
+        print("Target")
+        print(self.config.columns.target_column)
+        print()
+        print("Scaling")
+        print(self.config.scaling.enabled)
+        print(self.config.scaling.method.name)
+        print()
+        print("Train Split")
+        print(self.config.split.train_size)
+        print()
+        print("Validation Split")
+        print(self.config.split.validation_size)
+        print()
+        print("Test Split")
+        print(self.config.split.test_size)
+        print("=" * 70)    
+
+
+# ============================================================
+# DEFAULT DATASET CONFIGURATION
+# ============================================================
+
+dataset = DatasetConfig()
+
+configuration_manager = DatasetConfigurationManager(dataset)
+
+
+if __name__ == "__main__":
+
+    configuration_manager.validate()
+
+    configuration_manager.summary()
+
+    configuration_manager.save_json(
+
+        Path("dataset_configuration.json")
+
+    )
+
+    print()
+    print("Configuration Hash")
+    print(configuration_manager.configuration_hash())

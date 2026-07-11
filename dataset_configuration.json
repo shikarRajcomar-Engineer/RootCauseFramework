@@ -1,0 +1,55 @@
+{
+    "info": {
+        "name": "Unnamed Dataset",
+        "description": "",
+        "author": "Rajcomar",
+        "version": "1.0",
+        "created": "2026-07-11 17:26:35",
+        "dataset_id": "DATASET001"
+    },
+    "file": {
+        "file_path": ".",
+        "file_type": "CSV",
+        "encoding": "utf-8",
+        "has_header": true
+    },
+    "columns": {
+        "feature_columns": [],
+        "target_column": "",
+        "timestamp_column": "",
+        "ignore_columns": []
+    },
+    "split": {
+        "train_size": 0.7,
+        "validation_size": 0.15,
+        "test_size": 0.15,
+        "shuffle": true,
+        "random_seed": 42
+    },
+    "scaling": {
+        "enabled": true,
+        "method": "MINMAX",
+        "feature_range": [
+            0.0,
+            1.0
+        ],
+        "fit_on_training_only": true
+    },
+    "missing": {
+        "enabled": false,
+        "strategy": "NONE",
+        "maximum_missing_percentage": 0.2
+    },
+    "labels": {
+        "normal_label": 0,
+        "anomaly_label": 1,
+        "multiclass": false,
+        "label_mapping": {}
+    },
+    "validation": {
+        "validate_duplicates": true,
+        "validate_missing": true,
+        "validate_feature_names": true,
+        "validate_numeric": true
+    }
+}
