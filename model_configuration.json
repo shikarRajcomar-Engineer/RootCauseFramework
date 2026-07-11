@@ -1,0 +1,115 @@
+{
+    "info": {
+        "name": "Unnamed Model",
+        "description": "",
+        "version": "1.0",
+        "author": "Rajcomar",
+        "model_id": "MODEL001",
+        "created": "2026-07-11 20:19:50",
+        "model_type": "AUTOENCODER"
+    },
+    "architecture": {
+        "input_dimension": 0,
+        "hidden_layers": [],
+        "latent_dimension": 8,
+        "activation": "RELU",
+        "output_activation": "LINEAR",
+        "use_bias": true
+    },
+    "training": {
+        "train_model": true,
+        "epochs": 100,
+        "batch_size": 32,
+        "shuffle": true,
+        "validation_split": 0.2,
+        "random_seed": 42,
+        "verbose": 1
+    },
+    "optimizer": {
+        "optimizer": "ADAM",
+        "learning_rate": 0.001,
+        "beta1": 0.9,
+        "beta2": 0.999,
+        "epsilon": 1e-07
+    },
+    "loss": {
+        "loss_function": "MSE",
+        "reduction": "sum_over_batch_size"
+    },
+    "regularization": {
+        "use_dropout": false,
+        "dropout_rate": 0.3,
+        "use_batch_normalization": false,
+        "l1": 0.0,
+        "l2": 0.0
+    },
+    "early_stopping": {
+        "enabled": true,
+        "monitor": "val_loss",
+        "patience": 20,
+        "min_delta": 0.0,
+        "restore_best_weights": true
+    },
+    "checkpoint": {
+        "enabled": true,
+        "monitor": "val_loss",
+        "save_best_only": true,
+        "save_weights_only": false,
+        "mode": "min"
+    },
+    "storage": {
+        "use_saved_model": false,
+        "auto_load_if_exists": true,
+        "save_model": true,
+        "save_scaler": true,
+        "save_history": true,
+        "save_training_curves": true,
+        "save_configuration": true,
+        "save_optimizer_state": false,
+        "model_directory": "models",
+        "model_name": "UnnamedModel",
+        "model_version": "v1",
+        "overwrite_existing": false,
+        "export_tensorflow": true,
+        "export_onnx": false
+    },
+    "prediction": {
+        "batch_size": 512,
+        "return_reconstruction": true,
+        "return_latent_vector": false,
+        "verbose": 0
+    },
+    "hyperparameters": {
+        "enabled": false,
+        "search_method": "Manual",
+        "max_trials": 50,
+        "random_seed": 42,
+        "learning_rates": [
+            0.001
+        ],
+        "batch_sizes": [
+            32
+        ],
+        "epochs": [
+            100
+        ],
+        "latent_dimensions": [
+            8
+        ],
+        "hidden_layer_options": [
+            [
+                64,
+                32
+            ]
+        ],
+        "dropout_rates": [
+            0.0
+        ],
+        "optimizers": [
+            "ADAM"
+        ],
+        "activations": [
+            "RELU"
+        ]
+    }
+}
