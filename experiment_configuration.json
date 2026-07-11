@@ -1,0 +1,57 @@
+{
+    "info": {
+        "name": "Root Cause Attribution Experiment",
+        "description": "Bayesian Root Cause Attribution Experiment",
+        "version": "1.0",
+        "author": "Rajcomar",
+        "experiment_id": "EXP001",
+        "created": "2026-07-11 15:09:08",
+        "status": "DEVELOPMENT"
+    },
+    "faults": {
+        "enabled_faults": [],
+        "run_all_faults": false,
+        "repetitions": 1
+    },
+    "window": {
+        "window_type": "PERCENTAGE",
+        "window_size": 0.2,
+        "fixed_samples": 100
+    },
+    "statistics": {
+        "summary_method": "MEAN",
+        "normalize_scores": false,
+        "rank_method": "DESCENDING"
+    },
+    "bootstrap": {
+        "enabled": false,
+        "iterations": 1000,
+        "confidence_level": 0.95,
+        "random_seed": 42
+    },
+    "evaluation": {
+        "top_k": 1,
+        "compute_accuracy": true,
+        "compute_precision": true,
+        "compute_recall": true,
+        "compute_f1": true,
+        "compute_balanced_accuracy": true,
+        "compute_specificity": true,
+        "save_confusion_matrix": true
+    },
+    "output": {
+        "save_excel": true,
+        "save_figures": true,
+        "save_metadata": true,
+        "save_models": false,
+        "overwrite_existing": false,
+        "experiment_folder": "AUTO"
+    },
+    "runtime": {
+        "parallel_processing": false,
+        "number_of_workers": 1,
+        "verbose": true,
+        "save_intermediate_results": false,
+        "stop_on_error": true
+    }
+}

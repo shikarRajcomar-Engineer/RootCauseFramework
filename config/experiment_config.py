@@ -583,3 +583,233 @@ class ExperimentConfig:
     runtime: RuntimeConfig = field(
         default_factory=RuntimeConfig
     )
+
+# ============================================================
+# CONFIGURATION UTILITIES
+# ============================================================
+
+import json
+import hashlib
+from dataclasses import asdict
+
+
+class ExperimentConfigurationError(Exception):
+    """
+    Raised when an experiment configuration
+    is invalid.
+    """
+    pass
+
+
+# ============================================================
+# CONFIGURATION MANAGER
+# ============================================================
+
+
+class ExperimentConfigurationManager:
+    """
+    Utility class responsible for validating,
+    exporting and summarising experiment
+    configurations.
+    """
+
+    def __init__(self, config: ExperimentConfig):
+
+        self.config = config
+
+    # --------------------------------------------------------
+
+    def validate(self) -> None:
+        """
+        Validate the experiment configuration.
+        """
+
+        if self.config.window.window_size <= 0:
+
+            raise ExperimentConfigurationError(
+                "Window size must be greater than zero."
+            )
+
+        if self.config.window.window_type == WindowType.PERCENTAGE:
+
+            if self.config.window.window_size > 1.0:
+
+                raise ExperimentConfigurationError(
+                    "Percentage window must be between 0 and 1."
+                )
+
+        if self.config.bootstrap.iterations <= 0:
+
+            raise ExperimentConfigurationError(
+                "Bootstrap iterations must be positive."
+            )
+
+        if self.config.evaluation.top_k <= 0:
+
+            raise ExperimentConfigurationError(
+                "Top-K must be greater than zero."
+            )
+
+        if self.config.runtime.number_of_workers <= 0:
+
+            raise ExperimentConfigurationError(
+                "Number of workers must be positive."
+            )
+        
+    # --------------------------------------------------------
+
+    def to_dictionary(self) -> dict:
+        """
+        Convert the configuration into
+        a serialisable dictionary.
+        """
+
+        dictionary = asdict(self.config)
+
+        return self._convert(dictionary)
+
+    # --------------------------------------------------------
+
+    def save_json(self, filename) -> None:
+        """
+        Save experiment configuration.
+        """
+
+        with open(filename, "w", encoding="utf-8") as file:
+
+            json.dump(
+                self.to_dictionary(),
+                file,
+                indent=4
+            )
+
+    # --------------------------------------------------------
+
+    def configuration_hash(self) -> str:
+        """
+        Returns a SHA256 hash representing
+        the current configuration.
+        """
+
+        data = json.dumps(
+            self.to_dictionary(),
+            sort_keys=True
+        )
+
+        return hashlib.sha256(
+            data.encode("utf-8")
+        ).hexdigest()
+
+    # --------------------------------------------------------
+
+    @staticmethod
+    def _convert(item):
+
+        if isinstance(item, Enum):
+
+            return item.name
+
+        if isinstance(item, dict):
+
+            return {
+                key: ExperimentConfigurationManager._convert(value)
+                for key, value in item.items()
+            }
+
+        if isinstance(item, list):
+
+            return [
+                ExperimentConfigurationManager._convert(value)
+                for value in item
+            ]
+
+        return item
+    
+    # --------------------------------------------------------
+
+    def summary(self) -> None:
+        """
+        Display the current experiment.
+        """
+
+        print("=" * 70)
+
+        print(self.config.info.name)
+
+        print("=" * 70)
+
+        print(f"Experiment ID : {self.config.info.experiment_id}")
+
+        print(f"Version       : {self.config.info.version}")
+
+        print(f"Author        : {self.config.info.author}")
+
+        print()
+
+        print("Faults")
+
+        print(self.config.faults.enabled_faults)
+
+        print()
+
+        print("Window")
+
+        print(self.config.window.window_type.name)
+
+        print(self.config.window.window_size)
+
+        print()
+
+        print("Summary Statistic")
+
+        print(self.config.statistics.summary_method.name)
+
+        print()
+
+        print("Bootstrap")
+
+        print(self.config.bootstrap.enabled)
+
+        print(self.config.bootstrap.iterations)
+
+        print()
+
+        print("Top-K")
+
+        print(self.config.evaluation.top_k)
+
+        print()
+
+        print("Parallel")
+
+        print(self.config.runtime.parallel_processing)
+
+        print("=" * 70)
+
+
+# ============================================================
+# DEFAULT CONFIGURATION
+# ============================================================
+
+experiment = ExperimentConfig()
+
+configuration_manager = (
+    ExperimentConfigurationManager(experiment)
+)
+
+
+if __name__ == "__main__":
+
+    configuration_manager.validate()
+
+    configuration_manager.summary()
+
+    configuration_manager.save_json(
+        "experiment_configuration.json"
+    )
+
+    print()
+
+    print("Configuration Hash")
+
+    print(configuration_manager.configuration_hash())
