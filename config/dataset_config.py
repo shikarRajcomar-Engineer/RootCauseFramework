@@ -588,14 +588,8 @@ configuration_manager = DatasetConfigurationManager(dataset)
 if __name__ == "__main__":
 
     configuration_manager.validate()
-
     configuration_manager.summary()
-
-    configuration_manager.save_json(
-
-        Path("dataset_configuration.json")
-
-    )
+    configuration_manager.save_json(Path("dataset_configuration.json"))
 
     print()
     print("Configuration Hash")
