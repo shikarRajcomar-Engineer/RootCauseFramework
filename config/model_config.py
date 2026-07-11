@@ -231,7 +231,7 @@ class OptimizerConfig:
     beta2: float = 0.999
     epsilon: float = 1e-7
 
-    # ============================================================
+# ============================================================
 # LOSS CONFIGURATION
 # ============================================================
 
@@ -253,7 +253,7 @@ class LossConfig:
     loss_function: LossFunction = LossFunction.MSE
     reduction: str = "sum_over_batch_size"
 
-    # ============================================================
+# ============================================================
 # REGULARIZATION CONFIGURATION
 # ============================================================
 
@@ -345,8 +345,6 @@ class CheckpointConfig:
 # ============================================================
 # MODEL STORAGE CONFIGURATION
 # ============================================================
-
-
 @dataclass(slots=True)
 class ModelStorageConfig:
     """
@@ -392,6 +390,64 @@ class ModelStorageConfig:
 
 
 # ============================================================
+# HYPERPARAMETER CONFIGURATION
+# ============================================================
+@dataclass(slots=True)
+class HyperparameterConfig:
+    """
+    Hyperparameter search configuration.
+
+    Example
+    -------
+
+    model.hyperparameters.enabled = True
+    model.hyperparameters.search_method = "GridSearch"
+    model.hyperparameters.learning_rates = [0.01,0.001,0.0001]
+    model.hyperparameters.batch_sizes = [32,64,128]
+    model.hyperparameters.latent_dimensions = [4,8,16]
+    model.hyperparameters.hidden_layer_options = [
+        [64,32],
+        [128,64,32]
+    ]
+
+    model.hyperparameters.dropout_rates = [0.0,0.2,0.3]
+    model.hyperparameters.optimizers = [
+        OptimizerType.ADAM,
+        OptimizerType.RMSPROP
+    ]
+
+    """
+
+    enabled: bool = False
+    search_method: str = "Manual"
+    max_trials: int = 50
+    random_seed: int = DEFAULT_RANDOM_SEED
+    learning_rates: list[float] = field(
+        default_factory=lambda: [0.001]
+    )
+    batch_sizes: list[int] = field(
+        default_factory=lambda: [32]
+    )
+    epochs: list[int] = field(
+        default_factory=lambda: [100]
+    )
+    latent_dimensions: list[int] = field(
+        default_factory=lambda: [8]
+    )
+    hidden_layer_options: list[list[int]] = field(
+        default_factory=lambda: [[64, 32]]
+    )
+    dropout_rates: list[float] = field(
+        default_factory=lambda: [0.0]
+    )
+    optimizers: list[OptimizerType] = field(
+        default_factory=lambda: [OptimizerType.ADAM]
+    )
+    activations: list[ActivationFunction] = field(
+        default_factory=lambda: [ActivationFunction.RELU]
+    )
+
+# ============================================================
 # PREDICTION CONFIGURATION
 # ============================================================
 
@@ -406,13 +462,282 @@ class PredictionConfig:
 
     model.prediction.batch_size = 512
 
+    model.prediction.return_reconstruction = True
+
     model.prediction.return_latent_vector = False
 
-    model.prediction.return_reconstruction = True
+    model.prediction.verbose = 0
 
     """
 
     batch_size: int = 512
-    return_latent_vector: bool = False
+
     return_reconstruction: bool = True
+
+    return_latent_vector: bool = False
+
     verbose: int = 0
+
+# ============================================================
+# MASTER MODEL CONFIGURATION
+# ============================================================
+
+
+@dataclass(slots=True)
+class ModelConfig:
+    """
+    Master model configuration.
+
+    Example
+    -------
+
+    model.info.name
+
+    model.architecture.hidden_layers
+
+    model.training.epochs
+
+    model.storage.model_directory
+
+    """
+
+    info: ModelInfo = field(default_factory=ModelInfo)
+
+    architecture: ArchitectureConfig = field(default_factory=ArchitectureConfig)
+
+    training: TrainingConfig = field(default_factory=TrainingConfig)
+
+    optimizer: OptimizerConfig = field(default_factory=OptimizerConfig)
+
+    loss: LossConfig = field(default_factory=LossConfig)
+
+    regularization: RegularizationConfig = field(default_factory=RegularizationConfig)
+
+    early_stopping: EarlyStoppingConfig = field(default_factory=EarlyStoppingConfig)
+
+    checkpoint: CheckpointConfig = field(default_factory=CheckpointConfig)
+
+    storage: ModelStorageConfig = field(default_factory=ModelStorageConfig)
+
+    prediction: PredictionConfig = field(default_factory=PredictionConfig)
+
+    hyperparameters: HyperparameterConfig = field(default_factory=HyperparameterConfig)
+
+# ============================================================
+# CONFIGURATION ERROR
+# ============================================================
+
+
+class ModelConfigurationError(Exception):
+    """
+    Raised when the model configuration is invalid.
+    """
+    pass
+
+# ============================================================
+# MODEL CONFIGURATION MANAGER
+# ============================================================
+
+import json
+import hashlib
+from dataclasses import asdict
+
+
+class ModelConfigurationManager:
+    """
+    Utility class for validating, exporting and
+    summarising model configurations.
+    """
+
+    def __init__(self, config: ModelConfig):
+        self.config = config
+
+    # ========================================================
+    # VALIDATION
+    # ========================================================
+
+    def validate(self) -> None:
+        """
+        Validate the configuration.
+
+        NOTE
+        ----
+        This validates ONLY configuration values.
+
+        Runtime validation (input dimensions, datasets,
+        model files, etc.) is performed later by the
+        training and inference pipelines.
+        """
+
+        if self.config.training.epochs <= 0:
+            raise ModelConfigurationError(
+                "Training epochs must be greater than zero."
+            )
+
+        if self.config.training.batch_size <= 0:
+            raise ModelConfigurationError(
+                "Batch size must be greater than zero."
+            )
+
+        if not 0.0 <= self.config.training.validation_split <= 1.0:
+            raise ModelConfigurationError(
+                "Validation split must be between 0 and 1."
+            )
+
+        if self.config.optimizer.learning_rate <= 0:
+            raise ModelConfigurationError(
+                "Learning rate must be greater than zero."
+            )
+
+        if not 0.0 <= self.config.regularization.dropout_rate <= 1.0:
+            raise ModelConfigurationError(
+                "Dropout rate must be between 0 and 1."
+            )
+
+        if self.config.early_stopping.patience < 0:
+            raise ModelConfigurationError(
+                "Early stopping patience cannot be negative."
+            )
+
+    # ========================================================
+    # EXPORT
+    # ========================================================
+
+    def to_dictionary(self) -> dict:
+        """
+        Convert the configuration to a dictionary.
+        """
+
+        return self._convert(asdict(self.config))
+
+    def save_json(self, filename: str | Path) -> None:
+        """
+        Save the configuration as a JSON file.
+        """
+
+        with open(filename, "w", encoding="utf-8") as file:
+
+            json.dump(
+                self.to_dictionary(),
+                file,
+                indent=4
+            )
+
+    # ========================================================
+    # HASHING
+    # ========================================================
+
+    def configuration_hash(self) -> str:
+        """
+        Generate a unique SHA256 hash for the
+        current configuration.
+        """
+
+        configuration = json.dumps(
+            self.to_dictionary(),
+            sort_keys=True
+        )
+
+        return hashlib.sha256(
+            configuration.encode("utf-8")
+        ).hexdigest()
+
+    # ========================================================
+    # INTERNAL UTILITIES
+    # ========================================================
+
+    @staticmethod
+    def _convert(item):
+        """
+        Convert enums into strings so the configuration
+        can be exported to JSON.
+        """
+
+        if isinstance(item, Enum):
+            return item.name
+
+        if isinstance(item, dict):
+            return {
+                key: ModelConfigurationManager._convert(value)
+                for key, value in item.items()
+            }
+
+        if isinstance(item, list):
+            return [
+                ModelConfigurationManager._convert(value)
+                for value in item
+            ]
+
+        return item
+
+    # ========================================================
+    # SUMMARY
+    # ========================================================
+
+    def summary(self) -> None:
+        """
+        Print a summary of the model configuration.
+        """
+
+        print("=" * 70)
+        print(self.config.info.name)
+        print("=" * 70)
+
+        print(f"Model Type         : {self.config.info.model_type.name}")
+        print(f"Model ID           : {self.config.info.model_id}")
+        print(f"Model Version      : {self.config.storage.model_version}")
+
+        print()
+
+        print(f"Input Dimension    : {self.config.architecture.input_dimension}")
+        print(f"Hidden Layers      : {self.config.architecture.hidden_layers}")
+        print(f"Latent Dimension   : {self.config.architecture.latent_dimension}")
+
+        print()
+
+        print(f"Epochs             : {self.config.training.epochs}")
+        print(f"Batch Size         : {self.config.training.batch_size}")
+        print(f"Learning Rate      : {self.config.optimizer.learning_rate}")
+        print(f"Optimizer          : {self.config.optimizer.optimizer.name}")
+        print(f"Loss Function      : {self.config.loss.loss_function.name}")
+
+        print()
+
+        print(f"Train Model        : {self.config.training.train_model}")
+        print(f"Use Saved Model    : {self.config.storage.use_saved_model}")
+        print(f"Auto Load Model    : {self.config.storage.auto_load_if_exists}")
+
+        print()
+
+        print(f"Model Directory    : {self.config.storage.model_directory}")
+        print(f"Model Name         : {self.config.storage.model_name}")
+
+        print("=" * 70)
+
+# ============================================================
+# DEFAULT MODEL CONFIGURATION
+# ============================================================
+
+model = ModelConfig()
+
+configuration_manager = ModelConfigurationManager(model)
+
+# ============================================================
+# MAIN
+# ============================================================
+
+if __name__ == "__main__":
+
+    configuration_manager.validate()
+
+    configuration_manager.summary()
+
+    configuration_manager.save_json(
+        "model_configuration.json"
+    )
+
+    print()
+
+    print("Configuration Hash")
+
+    print(configuration_manager.configuration_hash())
