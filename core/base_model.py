@@ -232,3 +232,18 @@ class BaseModel(ABC):
             raise RuntimeError(
                 "Model has not been created."
             )
+# ============================================================
+# MAIN
+# ============================================================
+
+if __name__ == "__main__":
+
+    print("=" * 70)
+    print("BaseModel is an abstract base class.")
+    print("It cannot be executed directly.")
+    print()
+    print("Instantiate a derived model instead, for example:")
+    print("    Autoencoder")
+    print("    SensorAutoencoder")
+    print("    BayesianNetwork")
+    print("=" * 70)
