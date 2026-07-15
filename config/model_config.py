@@ -718,9 +718,8 @@ class ModelConfigurationManager:
 # DEFAULT MODEL CONFIGURATION
 # ============================================================
 
-model = ModelConfig()
-
-configuration_manager = ModelConfigurationManager(model)
+model_config = ModelConfig()
+configuration_manager = ModelConfigurationManager(model_config)
 
 # ============================================================
 # MAIN
